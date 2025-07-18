@@ -8,11 +8,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 
 @Controller
-@RequestMapping("/home")
+@RequestMapping("/")
 public class HomeController {
     @GetMapping
-    public String getMethodName(@RequestParam String param) {
-        return new String();
+    public String index() {
+        return "home/index";
     }
     
 }
