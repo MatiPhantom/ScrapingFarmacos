@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Producto {
     private String nombre;
-    private double precio;
+    private String precio;
     private String laboratorio;
     private String codigoDigemid;
     private String fuente;
