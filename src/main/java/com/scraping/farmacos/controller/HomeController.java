@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.scraping.farmacos.scraper.InkafarmaScraper;
+import com.scraping.farmacos.scraper.MifarmaScraper;
 
 
 @Controller
@@ -15,10 +16,13 @@ import com.scraping.farmacos.scraper.InkafarmaScraper;
 public class HomeController {
     @Autowired
     private InkafarmaScraper inkafarmaScraper;
+    @Autowired
+    private MifarmaScraper mifarmaScraper;
 
     @GetMapping
     public String index() {
         inkafarmaScraper.buscar("paracetamol");
+        mifarmaScraper.buscar("paracetamol");
         return "home/index";
     }
     

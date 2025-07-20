@@ -1,17 +1,9 @@
 package com.scraping.farmacos.scraper;
 
-import java.io.File;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.apache.commons.math3.stat.descriptive.summary.Product;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -27,10 +19,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.scraping.farmacos.model.Producto;
 
 import lombok.extern.slf4j.Slf4j;
-
 @Component
 @Slf4j
-public class InkafarmaScraper {
+public class MifarmaScraper {
 
     @Autowired
     private ChromeOptions chromeOptions;
@@ -43,16 +34,15 @@ public class InkafarmaScraper {
         WebDriver driver = new ChromeDriver(chromeOptions);
 
         driver.get(
-                "https://inkafarma.pe/buscador?keyword=" + URLEncoder.encode(nombreProducto, StandardCharsets.UTF_8));
+                "https://www.mifarma.com.pe/buscador?keyword=" + URLEncoder.encode(nombreProducto, StandardCharsets.UTF_8));
 
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("div.card.product")));
-
-        WebElement webProducto = driver.findElement(By.cssSelector("div.card.product"));
-
-        String dataProducto = webProducto.getAttribute("data-product");
         try{
+            wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("div.card.product")));
+
+            WebElement webProducto = driver.findElement(By.cssSelector("div.card.product"));
+            
+            String dataProducto = webProducto.getAttribute("data-product");
             JsonNode jsonProducto = mapper.readTree(dataProducto);
             Producto producto= new Producto();
             producto.setNombre(jsonProducto.get("name").asText());
@@ -60,10 +50,10 @@ public class InkafarmaScraper {
             producto.setLaboratorio(jsonProducto.get("brand").asText());
             producto.setCodigoDigemid(jsonProducto.get("sapCode").asText());
             String url = webProducto.findElement(By.cssSelector("a.link")).getAttribute("href");
+            producto.setFuente("Mifarma: "+ url);
 
-            producto.setFuente("Inkafarma: "+ url);
-
-            log.info("Producto encontrado INKFARMA: {}", producto.toString());
+            log.info("Producto encontrado MIFARMA: {}", producto.toString());
+            driver.quit();
 
             return producto;
         }catch(Exception e){
@@ -72,9 +62,6 @@ public class InkafarmaScraper {
             driver.quit();
             return null;
         }
-        
-
-
     }
-
+        
 }
