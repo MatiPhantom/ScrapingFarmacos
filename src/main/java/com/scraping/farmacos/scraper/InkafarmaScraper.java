@@ -66,7 +66,7 @@ public class InkafarmaScraper {
             
             log.error("Error al extraer datos del producto: ", e);
             driver.quit();
-            return new Producto();
+            return null;
         }
         
 
