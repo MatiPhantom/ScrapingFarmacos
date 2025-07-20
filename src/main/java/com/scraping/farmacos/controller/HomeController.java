@@ -25,9 +25,9 @@ public class HomeController {
 
     @GetMapping
     public String index() {
-        //inkafarmaScraper.buscar("paracetamol");
-        //mifarmaScraper.buscar("paracetamol");
-        hogarYSaludScraper.buscar("paracetamol");
+        inkafarmaScraper.buscar("TAMSULOSINA 0.4MG X 50CAPS");
+        mifarmaScraper.buscar("TAMSULOSINA 0.4MG X 50CAPS");
+        hogarYSaludScraper.buscar("TAMSULOSINA 0.4MG X 50CAPS");
         return "home/index";
     }
     
