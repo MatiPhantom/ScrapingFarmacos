@@ -116,9 +116,9 @@ public class DigemidScraper {
             });
             String registroSanitario = registroSanitarioInput.getAttribute("ng-reflect-model");
 
-            // Extraer datos del producto
+            // Extraer datos del producto y contruyendo objeto Producto
             Producto producto = Producto.builder()
-                    .nombre(celdas.get(2).getText().trim())
+                    .nombre(query)
                     .laboratorio(celdas.get(3).getText().trim())
                     .precio(celdas.get(5).getText().trim())
                     .codigoDigemid(registroSanitario)
