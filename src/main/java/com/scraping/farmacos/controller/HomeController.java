@@ -39,7 +39,7 @@ public class HomeController {
         // hogarYSaludScraper.buscar("TAMSULOSINA 0.4MG X 50CAPS");
         // boticasYSaludScraper.buscar("PARACETAMOL");
         // googleApiClient.getResult("PARACETAMOL TABX500MGX100");
-        // digemidScraper.buscar("TAMSULOSINA");
+        digemidScraper.buscarCodigoSanitario("TAMSULOSINA");
 
         return "home/index";
     }

@@ -17,6 +17,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.scraping.farmacos.model.Producto;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Component
@@ -26,16 +28,18 @@ public class DigemidScraper {
     @Autowired
     private ChromeOptions chromeOptions;
 
+    private final String baseUrl = "https://opm-digemid.minsa.gob.pe/#/consulta-producto";
+
     private final Random random = new Random();
 
-    public String buscarCodigoSanitario(String query) {
+    public Producto buscarCodigoSanitario(String query) {
 
         WebDriver driver = new ChromeDriver(chromeOptions);
 
         try {
 
             // Abrir la página de consulta de productos
-            driver.get("https://opm-digemid.minsa.gob.pe/#/consulta-producto");
+            driver.get(baseUrl);
 
             // Configurando tiempo maximo de espera
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(90));
@@ -98,10 +102,9 @@ public class DigemidScraper {
                     By.cssSelector("table.table.table-striped tbody tr"))).get(0);
 
             // Presionando en los detalles
-            WebElement celdaDetalles = firstResultTable.findElements(By.tagName("td")).get(6);
-            WebElement detalleLink = celdaDetalles.findElement(By.cssSelector("a[title='Ver detalle']"));
+            List<WebElement> celdas = firstResultTable.findElements(By.tagName("td"));
+            WebElement detalleLink = celdas.get(6).findElement(By.cssSelector("a[title='Ver detalle']"));
             detalleLink.click();
-
             WebElement modal = wait
                     .until(ExpectedConditions
                             .visibilityOfElementLocated(By.cssSelector("ngb-modal-window app-modal-producto-detalle")));
@@ -112,14 +115,26 @@ public class DigemidScraper {
                 return (value != null && !value.isEmpty()) ? inputReg : null;
             });
             String registroSanitario = registroSanitarioInput.getAttribute("ng-reflect-model");
-            log.info("Registro Sanitario encontrado: " + registroSanitario);
+
+            // Extraer datos del producto
+            Producto producto = Producto.builder()
+                    .nombre(celdas.get(2).getText().trim())
+                    .laboratorio(celdas.get(3).getText().trim())
+                    .precio(celdas.get(5).getText().trim())
+                    .codigoDigemid(registroSanitario)
+                    .fuente("DIGEMID - " + baseUrl)
+                    .build();
+            log.info("Producto encontrado DIGEMID: " + producto.toString());
             driver.quit();
-            return registroSanitario;
+            return producto;
 
         } catch (Exception e) {
             log.error("Error al extraer datos del producto: " + e.toString());
             driver.quit();
-            return "No encontrado";
+            return new Producto().builder()
+                    .nombre(query)
+                    .fuente("DIGEMID - " + baseUrl)
+                    .build();
         }
 
     }
