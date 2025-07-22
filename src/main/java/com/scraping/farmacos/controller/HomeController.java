@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.scraping.farmacos.api.GoogleApiClient;
 import com.scraping.farmacos.scraper.BoticasYSaludScraper;
+import com.scraping.farmacos.scraper.DigemidScraper;
 import com.scraping.farmacos.scraper.HogarYSaludScraper;
 import com.scraping.farmacos.scraper.InkafarmaScraper;
 import com.scraping.farmacos.scraper.MifarmaScraper;
-
 
 @Controller
 @RequestMapping("/")
@@ -29,16 +29,19 @@ public class HomeController {
     @Autowired
     private GoogleApiClient googleApiClient;
 
+    @Autowired
+    private DigemidScraper digemidScraper;
 
     @GetMapping
     public String index() {
-        //inkafarmaScraper.buscar("TAMSULOSINA 0.4MG X 50CAPS");
-        //mifarmaScraper.buscar("TAMSULOSINA 0.4MG X 50CAPS");
-        //hogarYSaludScraper.buscar("TAMSULOSINA 0.4MG X 50CAPS");
-        //boticasYSaludScraper.buscar("PARACETAMOL");
-        googleApiClient.getResult("PARACETAMOL TABX500MGX100");
-        
+        // inkafarmaScraper.buscar("TAMSULOSINA 0.4MG X 50CAPS");
+        // mifarmaScraper.buscar("TAMSULOSINA 0.4MG X 50CAPS");
+        // hogarYSaludScraper.buscar("TAMSULOSINA 0.4MG X 50CAPS");
+        // boticasYSaludScraper.buscar("PARACETAMOL");
+        // googleApiClient.getResult("PARACETAMOL TABX500MGX100");
+        // digemidScraper.buscar("TAMSULOSINA");
+
         return "home/index";
     }
-    
+
 }
