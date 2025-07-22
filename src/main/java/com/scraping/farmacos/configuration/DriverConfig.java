@@ -21,12 +21,7 @@ public class DriverConfig {
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
         options.addArguments("--disable-gpu"); // Deshabilitar GPU (recomendado para headless)
-        options.setExperimentalOption("excludeSwitches", new String[] { "enable-automation" });
-        options.addArguments(
-                "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36");
-        options.addArguments("--disable-extensions"); // Deshabilitar extensiones del navegador
-        options.addArguments("--remote-allow-origins=*"); // Permitir todas las conexiones remotas (opcional)
-        options.setExperimentalOption("useAutomationExtension", false);
+        options.setBinary(System.getenv("CHROME_BIN"));
 
         return options;
     }
