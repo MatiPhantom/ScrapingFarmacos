@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -22,7 +23,8 @@ import lombok.extern.slf4j.Slf4j;
 public class GoogleApiClient {
 
     private final HttpClient client = HttpClient.newHttpClient();
-    private final String apiKey = "";
+    @Value("${google.api.key}")
+    private String apiKey;
     private final ObjectMapper mapper = new ObjectMapper();
 
     public List<GoogleApiModel> getResult(String query) {
