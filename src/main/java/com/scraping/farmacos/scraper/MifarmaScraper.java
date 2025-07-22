@@ -1,67 +1,83 @@
 package com.scraping.farmacos.scraper;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.scraping.farmacos.model.Producto;
 
 import lombok.extern.slf4j.Slf4j;
-@Component
+
+@Component("MifarmaScraper")
 @Slf4j
-public class MifarmaScraper {
-
+public class MifarmaScraper implements ScraperStrategy {
     @Autowired
-    private ChromeOptions chromeOptions;
+    private ChromeOptions options;
 
-    private final ObjectMapper mapper= new ObjectMapper();
-    
+    public Producto buscar(String url) {
+        log.info("Iniciando scraping para Mifarma con URL: {}", url);
 
-    public Producto buscar(String nombreProducto) {
+        WebDriver driver = new ChromeDriver(options);
 
-        WebDriver driver = new ChromeDriver(chromeOptions);
+        try {
+            // Navegar a la URL
+            driver.get(url);
 
-        driver.get(
-                "https://www.mifarma.com.pe/buscador?keyword=" + URLEncoder.encode(nombreProducto, StandardCharsets.UTF_8));
+            // Esperar a que la página cargue completamente
+            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-        try{
-            wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("div.card.product")));
+            Producto producto = new Producto();
 
-            WebElement webProducto = driver.findElement(By.cssSelector("div.card.product"));
-            
-            String dataProducto = webProducto.getAttribute("data-product");
-            JsonNode jsonProducto = mapper.readTree(dataProducto);
-            Producto producto= new Producto();
-            producto.setNombre(jsonProducto.get("name").asText());
-            producto.setPrecio(jsonProducto.get("presentations").get(0).get("price").asText());
-            producto.setLaboratorio(jsonProducto.get("brand").asText());
-            producto.setCodigoDigemid(jsonProducto.get("sapCode").asText());
-            String url = webProducto.findElement(By.cssSelector("a.link")).getAttribute("href");
-            producto.setFuente("Mifarma: "+ url);
+            // Extraer el nombre del producto
+            WebElement nombreElement = driver.findElement(By.cssSelector("h1.product-detail-information__name"));
+            if (nombreElement != null) {
+                producto.setNombre(nombreElement.getText());
+            } else {
+                log.warn("No se encontró el nombre del producto en: {}", url);
+                return null;
+            }
 
-            log.info("Producto encontrado MIFARMA: {}", producto.toString());
-            driver.quit();
+            // Extraer el precio del producto
+            WebElement precioElement = driver.findElement(By.cssSelector("div.price-amount"));
+            if (precioElement != null) {
+                String precioTexto = precioElement.getText().replace("S/", "").trim();
+                producto.setPrecio(precioTexto);
+            } else {
+                log.warn("No se encontró el precio del producto en: {}", url);
+            }
 
+            // Extraer el laboratorio (marca)
+            WebElement laboratorioElement = driver.findElement(By.cssSelector("section[data-product-brand]"));
+            if (laboratorioElement != null) {
+                producto.setLaboratorio(laboratorioElement.getAttribute("data-product-brand"));
+            } else {
+                log.warn("No se encontró el laboratorio del producto en: {}", url);
+            }
+
+            // Código Digemid no está disponible directamente
+            producto.setCodigoDigemid("No encontrado");
+            producto.setFuente("Mifarma: " + url);
+
+            log.info("Producto encontrado Mifarma: {}", producto.toString());
             return producto;
-        }catch(Exception e){
-            
-            log.error("Error al extraer datos del producto: ", e);
-            driver.quit();
+
+        } catch (Exception e) {
+            log.error("Error al extraer datos del producto de Mifarma: ", e);
             return null;
+        } finally {
+            // Cerrar el navegador
+            driver.quit();
         }
     }
-        
+
 }

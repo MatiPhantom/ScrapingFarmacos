@@ -1,7 +1,5 @@
 package com.scraping.farmacos.scraper;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
 import org.openqa.selenium.By;
@@ -9,64 +7,68 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.scraping.farmacos.model.Producto;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Component
+@Component("InkafarmaScraper")
 @Slf4j
-public class InkafarmaScraper {
+public class InkafarmaScraper implements ScraperStrategy {
 
     @Autowired
-    private ChromeOptions chromeOptions;
+    private ChromeOptions options;
 
-    private final ObjectMapper mapper= new ObjectMapper();
-    
+    public Producto buscar(String url) {
+        log.info("Iniciando scraping para Inkafarma con URL: {}", url);
+        WebDriver driver = new ChromeDriver(options);
 
-    public Producto buscar(String nombreProducto) {
+        try {
+            // Navegar a la URL
+            driver.get(url);
 
-        WebDriver driver = new ChromeDriver(chromeOptions);
+            // Esperar a que la página cargue completamente
+            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(20));
 
-        driver.get(
-                "https://inkafarma.pe/buscador?keyword=" + URLEncoder.encode(nombreProducto, StandardCharsets.UTF_8));
+            Producto producto = new Producto();
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+            // Extraer el nombre del producto
+            WebElement nombreElement = driver.findElement(By.cssSelector("h1.product-detail-information__name"));
+            if (nombreElement != null) {
+                producto.setNombre(nombreElement.getText());
+            } else {
+                log.warn("No se encontró el nombre del producto en: {}", url);
+                return null;
+            }
 
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("div.card.product")));
+            // Extraer el precio
+            WebElement precioElement = driver.findElement(By.cssSelector("div.price-amount"));
+            if (precioElement != null) {
+                String precioTexto = precioElement.getText().replace("S/", "").trim();
+                producto.setPrecio(precioTexto);
+            }
 
-        WebElement webProducto = driver.findElement(By.cssSelector("div.card.product"));
+            // Extraer el laboratorio
+            WebElement laboratorioElement = driver.findElement(By.cssSelector("section[data-product-brand]"));
+            if (laboratorioElement != null) {
+                producto.setLaboratorio(laboratorioElement.getAttribute("data-product-brand"));
+            }
 
-        String dataProducto = webProducto.getAttribute("data-product");
-        try{
-            JsonNode jsonProducto = mapper.readTree(dataProducto);
-            Producto producto= new Producto();
-            producto.setNombre(jsonProducto.get("name").asText());
-            producto.setPrecio(jsonProducto.get("presentations").get(0).get("price").asText());
-            producto.setLaboratorio(jsonProducto.get("brand").asText());
-            producto.setCodigoDigemid(jsonProducto.get("sapCode").asText());
-            String url = webProducto.findElement(By.cssSelector("a.link")).getAttribute("href");
-
-            producto.setFuente("Inkafarma: "+ url);
+            // Código Digemid no está disponible directamente en esta página
+            producto.setCodigoDigemid("No encontrado");
+            producto.setFuente("Inkafarma: " + url);
 
             log.info("Producto encontrado INKFARMA: {}", producto.toString());
-
             return producto;
-        }catch(Exception e){
-            
+
+        } catch (Exception e) {
             log.error("Error al extraer datos del producto: ", e);
-            driver.quit();
             return null;
+        } finally {
+            // Cerrar el navegador
+            driver.quit();
         }
-        
-
-
     }
-
 }

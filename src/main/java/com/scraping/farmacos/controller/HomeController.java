@@ -1,47 +1,48 @@
 package com.scraping.farmacos.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import java.util.List;
 
-import com.scraping.farmacos.api.GoogleApiClient;
-import com.scraping.farmacos.scraper.BoticasYSaludScraper;
-import com.scraping.farmacos.scraper.DigemidScraper;
-import com.scraping.farmacos.scraper.HogarYSaludScraper;
-import com.scraping.farmacos.scraper.InkafarmaScraper;
-import com.scraping.farmacos.scraper.MifarmaScraper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import com.scraping.farmacos.model.Producto;
+import com.scraping.farmacos.service.ProductoService;
+import com.scraping.farmacos.tools.ExcelExporter;
+
+import jakarta.servlet.http.HttpServletResponse;
+
+import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 @RequestMapping("/")
 public class HomeController {
-    @Autowired
-    private InkafarmaScraper inkafarmaScraper;
-    @Autowired
-    private MifarmaScraper mifarmaScraper;
-    @Autowired
-    private HogarYSaludScraper hogarYSaludScraper;
-    @Autowired
-    private BoticasYSaludScraper boticasYSaludScraper;
 
     @Autowired
-    private GoogleApiClient googleApiClient;
+    private ProductoService productoService;
 
-    @Autowired
-    private DigemidScraper digemidScraper;
+    private final String[] farmacos = { "TAMSULOSINA 0.4MG X 50 CAPS",
+            "APRONAX TABX550MGX120",
+            "FRUTTIFLEX-50 ADULTO",
+            "CIPROFLOXACINO TABX500MGX100",
+            "PARACETAMOL TABX500MGX100" };
 
     @GetMapping
-    public String index() {
-        // inkafarmaScraper.buscar("TAMSULOSINA 0.4MG X 50CAPS");
-        // mifarmaScraper.buscar("TAMSULOSINA 0.4MG X 50CAPS");
-        // hogarYSaludScraper.buscar("TAMSULOSINA 0.4MG X 50CAPS");
-        // boticasYSaludScraper.buscar("PARACETAMOL");
-        // googleApiClient.getResult("PARACETAMOL TABX500MGX100");
-        digemidScraper.buscarCodigoSanitario("TAMSULOSINA");
+    public String index(Model modelo) {
+
+        List<Producto> listFarmacos = productoService.getProductos();
+        modelo.addAttribute("farmacos", listFarmacos);
 
         return "home/index";
+    }
+
+    @PostMapping
+    public void exportarExcel(HttpServletResponse response) {
+        try {
+            ExcelExporter.exportar(productoService.getProductos(), response);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

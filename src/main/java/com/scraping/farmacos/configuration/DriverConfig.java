@@ -16,7 +16,7 @@ public class DriverConfig {
         System.setProperty("webdriver.chrome.driver", driverPath);
         ChromeOptions options = new ChromeOptions();
 
-        // options.addArguments("--headless");
+        options.addArguments("--headless");
         options.addArguments("start-maximized");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
