@@ -9,8 +9,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class DriverConfig {
 
+    // private final String driverPath = new
+    // File("src/main/resources/driver/chromedriver.exe").getAbsolutePath();;
+
     @Bean
     public ChromeOptions chromeOptions() {
+        // System.setProperty("webdriver.chrome.driver", driverPath);
         ChromeOptions options = new ChromeOptions();
 
         options.addArguments("--headless");

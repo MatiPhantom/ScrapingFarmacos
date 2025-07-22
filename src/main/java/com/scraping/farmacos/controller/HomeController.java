@@ -21,12 +21,6 @@ public class HomeController {
     @Autowired
     private ProductoService productoService;
 
-    private final String[] farmacos = { "TAMSULOSINA 0.4MG X 50 CAPS",
-            "APRONAX TABX550MGX120",
-            "FRUTTIFLEX-50 ADULTO",
-            "CIPROFLOXACINO TABX500MGX100",
-            "PARACETAMOL TABX500MGX100" };
-
     @GetMapping
     public String index(Model modelo) {
 

@@ -1,6 +1,8 @@
 package com.scraping.farmacos.scraper;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -22,7 +24,7 @@ public class InkafarmaScraper implements ScraperStrategy {
     private ChromeOptions options;
 
     public Producto buscar(String url) {
-        log.info("Iniciando scraping para Inkafarma con URL: {}", url);
+        log.info("Iniciando scraping para Hogar y Salud con URL: {}", url);
         WebDriver driver = new ChromeDriver(options);
 
         try {
@@ -56,8 +58,19 @@ public class InkafarmaScraper implements ScraperStrategy {
                 producto.setLaboratorio(laboratorioElement.getAttribute("data-product-brand"));
             }
 
-            // Código Digemid no está disponible directamente en esta página
-            producto.setCodigoDigemid("No encontrado");
+            try {
+                WebElement digemidElement = driver.findElement(
+                        By.xpath("//div[contains(@class, 'description-content')]//li[contains(text(), 'RS:')]"));
+                String digemidTexto = digemidElement.getText();
+                if (digemidTexto.contains(":")) {
+                    producto.setCodigoDigemid(digemidTexto.split(":")[1].trim());
+                } else {
+                    producto.setCodigoDigemid("No encontrado");
+                }
+            } catch (NoSuchElementException e) {
+                producto.setCodigoDigemid("No encontrado");
+            }
+
             producto.setFuente("Inkafarma: " + url);
 
             log.info("Producto encontrado INKFARMA: {}", producto.toString());
