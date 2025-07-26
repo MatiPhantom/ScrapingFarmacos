@@ -1,6 +1,6 @@
 package com.scraping.farmacos.scraper;
 
-import com.scraping.farmacos.model.Producto;
+import com.scraping.farmacos.persistence.model.Producto;
 
 public interface ScraperStrategy {
 

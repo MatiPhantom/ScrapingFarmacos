@@ -22,7 +22,7 @@ public class DriverConfig {
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
         options.addArguments("--disable-gpu"); // Deshabilitar GPU (recomendado para headless)
-        options.setBinary(System.getenv("CHROME_BIN"));
+        // options.setBinary(System.getenv("CHROME_BIN")); //LINEA ADICIONAL PARA RENDER
 
         return options;
     }

@@ -6,7 +6,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import com.scraping.farmacos.model.Producto;
+import com.scraping.farmacos.persistence.model.Producto;
 
 import jakarta.servlet.http.HttpServletResponse;
 

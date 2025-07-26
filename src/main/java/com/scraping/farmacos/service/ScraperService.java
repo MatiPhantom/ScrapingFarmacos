@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.scraping.farmacos.api.GoogleApiClient;
 import com.scraping.farmacos.api.GoogleApiModel;
-import com.scraping.farmacos.model.Producto;
+import com.scraping.farmacos.persistence.model.Producto;
 import com.scraping.farmacos.scraper.ScraperStrategy;
 import com.scraping.farmacos.utils.Dominio;
 

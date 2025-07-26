@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.scraping.farmacos.model.Producto;
+import com.scraping.farmacos.persistence.model.Producto;
 
 import jakarta.annotation.PostConstruct;
 

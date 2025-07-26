@@ -1,4 +1,4 @@
-package com.scraping.farmacos.model;
+package com.scraping.farmacos.persistence.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

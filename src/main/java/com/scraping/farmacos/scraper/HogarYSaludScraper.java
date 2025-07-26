@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.scraping.farmacos.model.Producto;
+import com.scraping.farmacos.persistence.model.Producto;
 
 import lombok.extern.slf4j.Slf4j;
 
